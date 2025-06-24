@@ -2,8 +2,6 @@ import dataclasses
 import enum
 import logging
 import socket
-import openpi.transforms as transforms
-from typing import Dict, List
 import openpi.shared.normalize as _normalize
 
 import tyro
@@ -40,6 +38,7 @@ class Default:
 @dataclasses.dataclass
 class Fixed:
     """Use a fixed policy for the given environment."""
+    stats_file_path: str
 
 @dataclasses.dataclass
 class Args:
@@ -96,7 +95,7 @@ def create_policy(args: Args) -> _policy.Policy:
     match args.policy:
         case Fixed():
             # Load from folder
-            fixed_norm_stats = _normalize.load("./fix_norm_stats.json")
+            fixed_norm_stats = _normalize.load(args.policy.stats_file_path)
 
             return _policy_config.create_trained_policy(
                 _config.get_config("pi0_fast_droid"), "gs://openpi-assets/checkpoints/pi0_fast_droid", default_prompt=None, norm_stats=fixed_norm_stats
