@@ -1,5 +1,3 @@
-from test.test_gzip import data1
-from test.test_shlex import data
 import dataclasses
 import enum
 import logging
