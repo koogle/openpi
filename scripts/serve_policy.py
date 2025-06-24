@@ -95,7 +95,9 @@ def create_policy(args: Args) -> _policy.Policy:
     match args.policy:
         case Fixed():
             # Load from folder
+            print("Loading fixed policy...")
             fixed_norm_stats = _normalize.load(args.policy.stats_file_path)
+            print(fixed_norm_stats)
 
             return _policy_config.create_trained_policy(
                 _config.get_config("pi0_fast_droid"), "gs://openpi-assets/checkpoints/pi0_fast_droid", default_prompt=None, norm_stats=fixed_norm_stats
