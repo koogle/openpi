@@ -102,7 +102,6 @@ def create_policy(args: Args) -> _policy.Policy:
             return _policy_config.create_trained_policy(
                 _config.get_config("pi0_fast_droid"), "gs://openpi-assets/checkpoints/pi0_fast_droid", default_prompt=None, norm_stats=fixed_norm_stats
             )
-
         case Checkpoint():
             return _policy_config.create_trained_policy(
                 _config.get_config(args.policy.config), args.policy.dir, default_prompt=args.default_prompt
