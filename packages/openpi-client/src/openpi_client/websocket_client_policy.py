@@ -41,10 +41,31 @@ class WebsocketClientPolicy(_base_policy.BasePolicy):
                 time.sleep(5)
 
     @override
-    def infer(self, obs: Dict) -> Dict:  # noqa: UP006
+    def infer(self, obs: Dict, timeout: Optional[float] = None) -> Dict:  # noqa: UP006
+        """
+        Send an observation to the server and receive the inference result.
+
+        Args:
+            obs: The observation dictionary.
+            timeout: Optional timeout in seconds for the response.
+
+        Returns:
+            The inference result dictionary.
+
+        Raises:
+            RuntimeError: If the server returns an error string or if a timeout occurs.
+        """
         data = self._packer.pack(obs)
         self._ws.send(data)
-        response = self._ws.recv()
+        try:
+            if timeout is not None:
+                # websockets.sync.client.ClientConnection has a 'recv' method that accepts a 'timeout' parameter
+                # as of websockets 12.0+ (see https://websockets.readthedocs.io/en/stable/reference/sync/client.html)
+                response = self._ws.recv(timeout=timeout)
+            else:
+                response = self._ws.recv()
+        except TimeoutError:
+            raise RuntimeError(f"Timeout waiting for inference response (timeout={timeout}s)")
         if isinstance(response, str):
             # we're expecting bytes; if the server sends a string, it's an error.
             raise RuntimeError(f"Error in inference server:\n{response}")
